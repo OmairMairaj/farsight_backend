@@ -17,9 +17,8 @@ export async function authMiddleware(req) {
             return NextResponse.json({ message: 'User not found' }, { status: 404 });
         }
 
-        req.user = user; // Attach user to request
-        return null; // No errors, allow request
+        return user; // ✅ Return the user instead of modifying req
     } catch (error) {
-        return NextResponse.json({ message: 'Invalid token', error: error }, { status: 401 });
+        return NextResponse.json({ message: 'Invalid token', error: error.message }, { status: 401 });
     }
 }

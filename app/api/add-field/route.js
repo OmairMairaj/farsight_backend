@@ -4,13 +4,13 @@ import { corsHeaders } from '@/config/cors';
 
 export async function PUT(req) {
     await connectDB();
-
+    const origin = req.headers.origin;
     try {
         const { fieldName, defaultValue } = await req.json(); // ✅ Field & Default Value
 
         if (!fieldName) {
             return new Response(JSON.stringify({ message: 'Field name is required' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 400,
             });
         }
@@ -21,7 +21,7 @@ export async function PUT(req) {
 
         if (categories.length === 0) {
             return new Response(JSON.stringify({ message: "No categories found in the database" }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 404,
             });
         }
@@ -32,7 +32,7 @@ export async function PUT(req) {
 
         if (result.modifiedCount === 0) {
             return new Response(JSON.stringify({ message: `No documents were modified. The field '${fieldName}' may already exist.` }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 200,
             });
         }
@@ -41,14 +41,14 @@ export async function PUT(req) {
             message: `Field '${fieldName}' added to all categories`,
             modifiedCount: result.modifiedCount
         }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 200,
         });
 
     } catch (error) {
         console.error('🚨 Error adding field:', error);
         return new Response(JSON.stringify({ message: 'Error adding field' }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 500,
         });
     }

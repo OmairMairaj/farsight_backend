@@ -2,13 +2,14 @@ import cloudinary from '@/config/cloudinary';
 import { corsHeaders } from '@/config/cors';
 
 export async function POST(req) {
+    const origin = req.headers.origin;
     try {
         const contentType = req.headers.get('content-type') || '';
 
         if (!contentType.includes('multipart/form-data')) {
             return new Response(JSON.stringify({ message: 'Invalid content type. Must be multipart/form-data' }), {
                 status: 400,
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
             });
         }
 
@@ -18,7 +19,7 @@ export async function POST(req) {
         if (!files || files.length === 0) {
             return new Response(JSON.stringify({ message: 'No files uploaded' }), {
                 status: 400,
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
             });
         }
 
@@ -104,22 +105,23 @@ export async function POST(req) {
             urls: uploadedFiles.map(file => file.url), // ✅ Return full file metadata
         }), {
             status: 201,
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
         });
 
     } catch (error) {
         console.error('🚨 Upload Error:', error);
         return new Response(JSON.stringify({ message: 'Failed to upload files' }), {
             status: 500,
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
         });
     }
 }
 
 // ✅ Handle CORS preflight requests
-export async function OPTIONS() {
+export async function OPTIONS(req) {
+    const origin = req.headers.origin;
     return new Response(null, {
         status: 204,
-        headers: corsHeaders(),
+        headers: corsHeaders(origin),
     });
 }

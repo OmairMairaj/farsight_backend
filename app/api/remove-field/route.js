@@ -4,13 +4,13 @@ import { corsHeaders } from '@/config/cors';
 
 export async function PUT(req) {
     await connectDB();
-
+    const origin = req.headers.origin;
     try {
         const { fieldName } = await req.json(); // ✅ Field to remove (passed from frontend)
 
         if (!fieldName) {
             return new Response(JSON.stringify({ message: 'Field name is required' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 400,
             });
         }
@@ -22,14 +22,14 @@ export async function PUT(req) {
             message: `Field '${fieldName}' removed from all categories`,
             modifiedCount: result.modifiedCount
         }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 200,
         });
 
     } catch (error) {
         console.error('🚨 Error removing field:', error);
         return new Response(JSON.stringify({ message: 'Error removing field' }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 500,
         });
     }

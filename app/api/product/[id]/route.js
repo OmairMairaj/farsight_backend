@@ -5,6 +5,7 @@ import { corsHeaders } from '@/config/cors';
 
 export async function GET(req, { params }) {
     await connectDB();
+    const origin = req.headers.origin;
 
     try {
         const { id } = await params; // ✅ Await params.id properly
@@ -13,7 +14,7 @@ export async function GET(req, { params }) {
         // ✅ Validate required fields
         if (!productId) {
             return new Response(JSON.stringify({ message: 'Product ID is required' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 400,
             });
         }
@@ -26,20 +27,20 @@ export async function GET(req, { params }) {
 
         if (!product) {
             return new Response(JSON.stringify({ message: 'Product not found' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 404,
             });
         }
 
         return new Response(JSON.stringify(product), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 200,
         });
 
     } catch (error) {
         console.error('Error fetching product:', error);
         return new Response(JSON.stringify({ message: 'Error fetching product' }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 500,
         });
     }
@@ -47,7 +48,7 @@ export async function GET(req, { params }) {
 
 export async function PUT(req, { params }) {
     await connectDB();
-
+    const origin = req.headers.origin;
     try {
         const { id } = await params; // ✅ Await params.id properly
         const productId = id; // ✅ Await params.id properly
@@ -56,7 +57,7 @@ export async function PUT(req, { params }) {
         // ✅ Validate required fields
         if (!productId) {
             return new Response(JSON.stringify({ message: 'Product ID is required' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 400,
             });
         }
@@ -69,20 +70,20 @@ export async function PUT(req, { params }) {
 
         if (!updatedProduct) {
             return new Response(JSON.stringify({ message: 'Product not found' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 404,
             });
         }
 
         return new Response(JSON.stringify({ message: 'Product updated successfully', product: updatedProduct }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 200,
         });
 
     } catch (error) {
         console.error('Error updating product:', error);
         return new Response(JSON.stringify({ message: 'Error updating product' }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 500,
         });
     }
@@ -91,7 +92,7 @@ export async function PUT(req, { params }) {
 // ✅ Delete Product by ID API (Ensures all related stock data is deleted)
 export async function DELETE(req, context) {
     await connectDB();
-
+    const origin = req.headers.origin;
     try {
         const { id: productId } = context.params; // ✅ Extract product ID properly
         console.log("🗑️ Deleting Product with ID:", productId); // ✅ Debugging
@@ -99,7 +100,7 @@ export async function DELETE(req, context) {
         // ✅ Validate that the product ID exists
         if (!productId) {
             return new Response(JSON.stringify({ message: 'Product ID is required' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 400,
             });
         }
@@ -109,7 +110,7 @@ export async function DELETE(req, context) {
         if (!product) {
             console.log("❌ Product not found.");
             return new Response(JSON.stringify({ message: 'Product not found' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 404,
             });
         }
@@ -203,7 +204,7 @@ export async function DELETE(req, context) {
         if (!deletedProduct) {
             console.log("❌ Failed to delete product.");
             return new Response(JSON.stringify({ message: 'Error deleting product' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 500,
             });
         }
@@ -214,14 +215,14 @@ export async function DELETE(req, context) {
             message: 'Product and related stock entries deleted successfully',
             deletedStockCount: deletedStock.deletedCount,
         }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 200,
         });
 
     } catch (error) {
         console.error('🚨 Error deleting product:', error);
         return new Response(JSON.stringify({ message: 'Error deleting product' }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 500,
         });
     }
@@ -229,9 +230,10 @@ export async function DELETE(req, context) {
 
 
 // ✅ Handle CORS for preflight requests
-export async function OPTIONS() {
+export async function OPTIONS(req) {
+    const origin = req.headers.origin;
     return new Response(null, {
-        headers: corsHeaders(),
+        headers: corsHeaders(origin),
         status: 204,
     });
 }

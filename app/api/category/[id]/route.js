@@ -4,7 +4,7 @@ import { corsHeaders } from '@/config/cors';
 
 export async function PUT(req) {
     await connectDB();
-
+    const origin = req.headers.origin;
     try {
         const id = req.nextUrl.pathname.split('/').pop(); // ✅ Extract category ID from request URL
         const { category_name, category_image_path, comments } = await req.json();
@@ -12,7 +12,7 @@ export async function PUT(req) {
         if (!id) {
             return new Response(JSON.stringify({ message: 'Category ID is required' }), {
                 status: 400,
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
             });
         }
 
@@ -22,7 +22,7 @@ export async function PUT(req) {
         if (!category) {
             return new Response(JSON.stringify({ message: 'Category not found' }), {
                 status: 404,
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
             });
         }
 
@@ -39,28 +39,28 @@ export async function PUT(req) {
 
         return new Response(JSON.stringify(category), {
             status: 200,
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
         });
 
     } catch (error) {
         console.error('Error updating category:', error);
         return new Response(JSON.stringify({ message: 'Error updating category' }), {
             status: 500,
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
         });
     }
 }
 
 export async function DELETE(req, context) {
     await connectDB();
-
+    const origin = req.headers.origin;
     try {
         const { id } = context.params; // ✅ Extract category ID
 
         if (!id) {
             return new Response(JSON.stringify({ message: 'Category ID is required' }), {
                 status: 400,
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
             });
         }
 
@@ -72,7 +72,7 @@ export async function DELETE(req, context) {
             console.log("❌ Category not found.");
             return new Response(JSON.stringify({ message: 'Category not found' }), {
                 status: 404,
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
             });
         }
 
@@ -193,7 +193,7 @@ export async function DELETE(req, context) {
                         console.log("⚠️ Failed to delete stocks for product:", product.model);
                         return new Response(JSON.stringify({ message: 'Error deleting stock records' }), {
                             status: 500,
-                            headers: corsHeaders(),
+                            headers: corsHeaders(origin),
                         });
                     }
 
@@ -210,7 +210,7 @@ export async function DELETE(req, context) {
                 console.log("⚠️ Failed to delete products under this category.");
                 return new Response(JSON.stringify({ message: 'Error deleting products' }), {
                     status: 500,
-                    headers: corsHeaders(),
+                    headers: corsHeaders(origin),
                 });
             }
 
@@ -226,7 +226,7 @@ export async function DELETE(req, context) {
             console.log("⚠️ Failed to delete the category.");
             return new Response(JSON.stringify({ message: 'Error deleting category' }), {
                 status: 500,
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
             });
         }
 
@@ -238,22 +238,23 @@ export async function DELETE(req, context) {
             deletedStocks: products.reduce((acc, product) => acc + product.quantity, 0), // Total stock records deleted
         }), {
             status: 200,
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
         });
 
     } catch (error) {
         console.error('🚨 Error deleting category:', error);
         return new Response(JSON.stringify({ message: 'Error deleting category' }), {
             status: 500,
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
         });
     }
 }
 
 // ✅ Handle CORS for preflight requests
-export async function OPTIONS() {
+export async function OPTIONS(req) {
+    const origin = req.headers.origin;
     return new Response(null, {
         status: 204,
-        headers: corsHeaders(),
+        headers: corsHeaders(origin),
     });
 }

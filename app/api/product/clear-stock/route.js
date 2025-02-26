@@ -2,16 +2,16 @@ import connectDB from '@/config/db';
 import Product from '@/models/productModel';
 import { corsHeaders } from '@/config/cors';
 
-export async function DELETE() {
+export async function DELETE(req) {
     await connectDB();
-
+    const origin = req.headers.origin;
     try {
         // ✅ Find all products
         const products = await Product.find({});
 
         if (products.length === 0) {
             return new Response(JSON.stringify({ message: 'No products found.' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 404,
             });
         }
@@ -28,23 +28,24 @@ export async function DELETE() {
             message: `Stock data cleared from ${updatedProducts.length} products.`,
             products: updatedProducts
         }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 200,
         });
 
     } catch (error) {
         console.error('Error deleting stock data:', error);
         return new Response(JSON.stringify({ message: 'Error deleting stock data' }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 500,
         });
     }
 }
 
 // ✅ Handle CORS for preflight requests
-export async function OPTIONS() {
+export async function OPTIONS(req) {
+    const origin = req.headers.origin;
     return new Response(null, {
-        headers: corsHeaders(),
+        headers: corsHeaders(origin),
         status: 204,
     });
 }

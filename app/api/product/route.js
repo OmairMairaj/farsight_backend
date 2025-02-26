@@ -5,6 +5,7 @@ import { corsHeaders } from '@/config/cors'; // ✅ Ensure CORS is handled
 // ✅ Handle GET - Fetch products (with optional category filter)
 export async function GET(req) {
     await connectDB();
+    const origin = req.headers.origin;
     try {
         // ✅ Extract `category` query parameter from request
         const { searchParams } = new URL(req.url);
@@ -21,13 +22,13 @@ export async function GET(req) {
         }
 
         return new Response(JSON.stringify(products), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 200,
         });
     } catch (error) {
         console.error('Error fetching products:', error);
         return new Response(JSON.stringify({ message: 'Error fetching products' }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 500,
         });
     }
@@ -35,6 +36,7 @@ export async function GET(req) {
 
 export async function POST(req) {
     await connectDB();
+    const origin = req.headers.origin;
     try {
         const body = await req.json();
 
@@ -49,7 +51,7 @@ export async function POST(req) {
                 message: `Missing required fields: ${missingFields.join(", ")}`,
                 missingFields // ✅ Include missing fields array for debugging
             }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 400,
             });
         }
@@ -79,7 +81,7 @@ export async function POST(req) {
 
         if (!updatedCategory) {
             return new Response(JSON.stringify({ message: 'Category not found' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 404,
             });
         }
@@ -88,23 +90,24 @@ export async function POST(req) {
             message: 'Product added successfully',
             product: savedProduct
         }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 201,
         });
 
     } catch (error) {
         console.error('Error adding product:', error);
         return new Response(JSON.stringify({ message: 'Error adding product' }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 500,
         });
     }
 }
 
 // ✅ Handle CORS for preflight requests
-export async function OPTIONS() {
+export async function OPTIONS(req) {
+    const origin = req.headers.origin;
     return new Response(null, {
-        headers: corsHeaders(),
+        headers: corsHeaders(origin),
         status: 204,
     });
 }

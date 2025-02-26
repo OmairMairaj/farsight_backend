@@ -2,6 +2,7 @@ import cloudinary from '@/config/cloudinary';
 import { corsHeaders } from '@/config/cors';
 
 export async function POST(req) {
+    const origin = req.headers.origin;
     try {
         const formData = await req.formData();
         const file = formData.get('file');
@@ -9,7 +10,7 @@ export async function POST(req) {
         if (!file) {
             return new Response(JSON.stringify({ message: 'No file uploaded' }), {
                 status: 400,
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
             });
         }
 
@@ -31,22 +32,23 @@ export async function POST(req) {
             url: uploadRes.secure_url,
         }), {
             status: 201,
-            headers: corsHeaders(), // ✅ Ensure CORS headers are included
+            headers: corsHeaders(origin), // ✅ Ensure CORS headers are included
         });
 
     } catch (error) {
         console.error('Upload Error:', error);
         return new Response(JSON.stringify({ message: 'Failed to upload image' }), {
             status: 500,
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
         });
     }
 }
 
 // ✅ Handle OPTIONS method for CORS preflight requests
-export async function OPTIONS() {
+export async function OPTIONS(req) {
+    const origin = req.headers.origin;
     return new Response(null, {
-        headers: corsHeaders(),
+        headers: corsHeaders(origin),
         status: 204,
     });
 }

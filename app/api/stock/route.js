@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 
 export async function GET(req) {
     await connectDB();
-
+    const origin = req.headers.origin;
     try {
         // ✅ Extract `product_id` from query parameters
         const { searchParams } = new URL(req.url);
@@ -14,7 +14,7 @@ export async function GET(req) {
 
         if (!productId) {
             return new Response(JSON.stringify({ message: 'Product ID is required' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 400,
             });
         }
@@ -23,14 +23,14 @@ export async function GET(req) {
         const stocks = await Stock.find({ product_id: productId }).sort({ date: -1 });
 
         return new Response(JSON.stringify(stocks), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 200,
         });
 
     } catch (error) {
         console.error('Error fetching stocks:', error);
         return new Response(JSON.stringify({ message: 'Error fetching stocks' }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 500,
         });
     }
@@ -38,6 +38,7 @@ export async function GET(req) {
 
 export async function POST(req) {
     await connectDB();
+    const origin = req.headers.origin;
     const session = await mongoose.startSession(); // ✅ Start a transaction
 
     try {
@@ -51,7 +52,7 @@ export async function POST(req) {
             await session.abortTransaction();
             session.endSession();
             return new Response(JSON.stringify({ message: 'Missing or invalid fields' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 400,
             });
         }
@@ -61,7 +62,7 @@ export async function POST(req) {
             await session.abortTransaction();
             session.endSession();
             return new Response(JSON.stringify({ message: 'Product not found' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 404,
             });
         }
@@ -70,7 +71,7 @@ export async function POST(req) {
             await session.abortTransaction();
             session.endSession();
             return new Response(JSON.stringify({ message: 'Not enough stock available' }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 400,
             });
         }
@@ -110,7 +111,7 @@ export async function POST(req) {
             stock: newStock,
             product
         }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 201,
         });
 
@@ -119,16 +120,17 @@ export async function POST(req) {
         session.endSession();
         console.error('🚨 Error adding stock:', error);
         return new Response(JSON.stringify({ message: 'Error adding stock' }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 500,
         });
     }
 }
 
 // ✅ Handle CORS for preflight requests
-export async function OPTIONS() {
+export async function OPTIONS(req) {
+    const origin = req.headers.origin;
     return new Response(null, {
-        headers: corsHeaders(),
+        headers: corsHeaders(origin),
         status: 204,
     });
 }

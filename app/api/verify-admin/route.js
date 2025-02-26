@@ -4,9 +4,10 @@ import bcrypt from "bcrypt";
 import { corsHeaders } from "@/config/cors";
 
 // ✅ Handle CORS preflight requests
-export async function OPTIONS() {
+export async function OPTIONS(req) {
+    const origin = req.headers.origin;
     return new Response(null, {
-        headers: corsHeaders(),
+        headers: corsHeaders(origin),
         status: 204,
     });
 }
@@ -14,7 +15,7 @@ export async function OPTIONS() {
 // ✅ Connect to Database
 export async function PUT(req) {
     await connectDB();
-
+    const origin = req.headers.origin;
     try {
         const { password } = await req.json();
 
@@ -22,7 +23,7 @@ export async function PUT(req) {
 
         if (!password) {
             return new Response(JSON.stringify({ message: "Admin password is required" }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 400,
             });
         }
@@ -33,7 +34,7 @@ export async function PUT(req) {
         console.log(user);
         if (!user || user.role !== "admin") {
             return new Response(JSON.stringify({ message: "Unauthorized request" }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 401,
             });
         }
@@ -42,20 +43,20 @@ export async function PUT(req) {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return new Response(JSON.stringify({ message: "Incorrect password" }), {
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
                 status: 401,
             });
         }
 
         return new Response(JSON.stringify({ message: "Password verified" }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 200,
         });
 
     } catch (error) {
         console.error("🚨 Error verifying admin:", error.message);
         return new Response(JSON.stringify({ message: "Server error" }), {
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
             status: 500,
         });
     }

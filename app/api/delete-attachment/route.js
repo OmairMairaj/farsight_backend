@@ -2,6 +2,7 @@ import cloudinary from '@/config/cloudinary';
 import { corsHeaders } from '@/config/cors';
 
 export async function DELETE(req) {
+    const origin = req.headers.origin;
     try {
         const { searchParams } = new URL(req.url);
         let publicId = searchParams.get('public_id');
@@ -11,7 +12,7 @@ export async function DELETE(req) {
         if (!publicId) {
             return new Response(JSON.stringify({ message: 'Missing public_id' }), {
                 status: 400,
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
             });
         }
 
@@ -35,28 +36,29 @@ export async function DELETE(req) {
         if (result.result !== 'ok') {
             return new Response(JSON.stringify({ message: 'Failed to delete file from Cloudinary' }), {
                 status: 500,
-                headers: corsHeaders(),
+                headers: corsHeaders(origin),
             });
         }
 
         return new Response(JSON.stringify({ message: 'File deleted successfully' }), {
             status: 200,
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
         });
 
     } catch (error) {
         console.error('🚨 Delete File Error:', error);
         return new Response(JSON.stringify({ message: 'Failed to delete file' }), {
             status: 500,
-            headers: corsHeaders(),
+            headers: corsHeaders(origin),
         });
     }
 }
 
 // ✅ Ensure CORS for preflight requests
-export async function OPTIONS() {
+export async function OPTIONS(req) {
+    const origin = req.headers.origin;
     return new Response(null, {
         status: 204,
-        headers: corsHeaders(),
+        headers: corsHeaders(origin),
     });
 };

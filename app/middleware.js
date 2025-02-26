@@ -20,6 +20,6 @@ export async function authMiddleware(req) {
         req.user = user; // Attach user to request
         return null; // No errors, allow request
     } catch (error) {
-        return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
+        return NextResponse.json({ message: 'Invalid token', error: error }, { status: 401 });
     }
 }

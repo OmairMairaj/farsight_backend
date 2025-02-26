@@ -2,7 +2,6 @@ import connectDB from '@/config/db';
 // import { Category, Product } from '../model';
 import Category from '@/models/categoryModel';
 import Product from '@/models/productModel';
-import mongoose from 'mongoose';
 
 export async function POST(req) {
     await connectDB();

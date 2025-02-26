@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server';
 import cloudinary from '@/config/cloudinary';
 import { corsHeaders } from '@/config/cors';
 

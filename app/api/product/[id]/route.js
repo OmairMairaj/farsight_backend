@@ -1,6 +1,5 @@
 import connectDB from '@/config/db';
 import Product from '@/models/productModel';
-import Category from '@/models/categoryModel';
 import Stock from '@/models/stockModel';
 import { corsHeaders } from '@/config/cors';
 

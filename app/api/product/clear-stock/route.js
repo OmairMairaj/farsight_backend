@@ -2,7 +2,7 @@ import connectDB from '@/config/db';
 import Product from '@/models/productModel';
 import { corsHeaders } from '@/config/cors';
 
-export async function DELETE(req) {
+export async function DELETE() {
     await connectDB();
 
     try {

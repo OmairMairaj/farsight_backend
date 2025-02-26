@@ -4,7 +4,7 @@ import { corsHeaders } from '@/config/cors';
 
 export async function DELETE(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         // ✅ Find all products
         const products = await Product.find({});
@@ -43,7 +43,7 @@ export async function DELETE(req) {
 
 // ✅ Handle CORS for preflight requests
 export async function OPTIONS(req) {
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     return new Response(null, {
         headers: corsHeaders(origin),
         status: 204,

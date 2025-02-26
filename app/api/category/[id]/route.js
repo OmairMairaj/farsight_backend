@@ -4,7 +4,7 @@ import { corsHeaders } from '@/config/cors';
 
 export async function PUT(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const id = req.nextUrl.pathname.split('/').pop(); // ✅ Extract category ID from request URL
         const { category_name, category_image_path, comments } = await req.json();
@@ -53,7 +53,7 @@ export async function PUT(req) {
 
 export async function DELETE(req, context) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const { id } = context.params; // ✅ Extract category ID
 
@@ -252,7 +252,7 @@ export async function DELETE(req, context) {
 
 // ✅ Handle CORS for preflight requests
 export async function OPTIONS(req) {
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     return new Response(null, {
         status: 204,
         headers: corsHeaders(origin),

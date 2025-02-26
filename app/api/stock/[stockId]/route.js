@@ -5,7 +5,7 @@ import { corsHeaders } from '@/config/cors';
 
 export async function PUT(req, context) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const { stockId } = await context.params; // ✅ Directly access params without await
         console.log("🛠️ Stock ID from Params:", stockId);
@@ -86,7 +86,7 @@ export async function PUT(req, context) {
 
 export async function DELETE(req, { params }) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const stockId = params?.stockId || params?.id; // Ensure correct ID extraction
         console.log("🗑️ Deleting Stock with ID:", stockId);
@@ -166,7 +166,7 @@ export async function DELETE(req, { params }) {
 
 // ✅ Handle CORS for preflight requests
 export async function OPTIONS(req) {
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     return new Response(null, {
         headers: corsHeaders(origin),
         status: 204,

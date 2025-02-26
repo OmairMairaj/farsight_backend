@@ -2,7 +2,7 @@ import cloudinary from '@/config/cloudinary';
 import { corsHeaders } from '@/config/cors';
 
 export async function POST(req) {
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const contentType = req.headers.get('content-type') || '';
 
@@ -119,7 +119,7 @@ export async function POST(req) {
 
 // ✅ Handle CORS preflight requests
 export async function OPTIONS(req) {
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     return new Response(null, {
         status: 204,
         headers: corsHeaders(origin),

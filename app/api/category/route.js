@@ -4,7 +4,7 @@ import { corsHeaders } from '@/config/cors';
 
 export async function GET(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const categories = await Category.find().populate('products');
         return new Response(JSON.stringify(categories), {
@@ -24,7 +24,7 @@ export async function GET(req) {
 // ✅ Create a new category (POST API)
 export async function POST(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const { category_name, category_image_path, comments } = await req.json();
 
@@ -62,7 +62,7 @@ export async function POST(req) {
 
 // ✅ Handle CORS for preflight requests
 export async function OPTIONS(req) {
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     return new Response(null, {
         status: 204,
         headers: corsHeaders(origin),

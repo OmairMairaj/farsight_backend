@@ -7,7 +7,7 @@ import { authMiddleware } from '../../middleware';
 
 export async function POST(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const { name, email, password } = await req.json();
 
@@ -48,7 +48,7 @@ export async function POST(req) {
 
 export async function PUT(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const { email, password } = await req.json();
 
@@ -102,7 +102,7 @@ export async function PUT(req) {
 
 export async function GET(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     const authCheck = await authMiddleware(req);
     if (authCheck) return authCheck;
 
@@ -114,7 +114,7 @@ export async function GET(req) {
 
 export async function DELETE(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     const authCheck = await authMiddleware(req);
     if (authCheck) return authCheck;
 
@@ -134,7 +134,7 @@ export async function DELETE(req) {
 }
 
 export async function OPTIONS(req) {
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     return new Response(null, {
         headers: corsHeaders(origin),
         status: 204,

@@ -5,7 +5,7 @@ import { corsHeaders } from "@/config/cors";
 
 // ✅ Handle CORS preflight requests
 export async function OPTIONS(req) {
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     return new Response(null, {
         headers: corsHeaders(origin),
         status: 204,
@@ -15,7 +15,7 @@ export async function OPTIONS(req) {
 // ✅ Connect to Database
 export async function PUT(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const { password } = await req.json();
 

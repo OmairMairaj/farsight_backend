@@ -4,7 +4,7 @@ import { corsHeaders } from '@/config/cors';
 
 export async function PUT(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const { fieldName, defaultValue } = await req.json(); // ✅ Field & Default Value
 

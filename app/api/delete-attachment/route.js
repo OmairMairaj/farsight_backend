@@ -2,7 +2,7 @@ import cloudinary from '@/config/cloudinary';
 import { corsHeaders } from '@/config/cors';
 
 export async function DELETE(req) {
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const { searchParams } = new URL(req.url);
         let publicId = searchParams.get('public_id');
@@ -56,7 +56,7 @@ export async function DELETE(req) {
 
 // ✅ Ensure CORS for preflight requests
 export async function OPTIONS(req) {
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     return new Response(null, {
         status: 204,
         headers: corsHeaders(origin),

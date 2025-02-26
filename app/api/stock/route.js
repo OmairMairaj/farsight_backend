@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 
 export async function GET(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         // ✅ Extract `product_id` from query parameters
         const { searchParams } = new URL(req.url);
@@ -38,7 +38,7 @@ export async function GET(req) {
 
 export async function POST(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     const session = await mongoose.startSession(); // ✅ Start a transaction
 
     try {
@@ -128,7 +128,7 @@ export async function POST(req) {
 
 // ✅ Handle CORS for preflight requests
 export async function OPTIONS(req) {
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     return new Response(null, {
         headers: corsHeaders(origin),
         status: 204,

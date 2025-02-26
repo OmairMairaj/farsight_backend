@@ -5,7 +5,7 @@ import { corsHeaders } from '@/config/cors'; // ✅ Ensure CORS is handled
 // ✅ Handle GET - Fetch products (with optional category filter)
 export async function GET(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         // ✅ Extract `category` query parameter from request
         const { searchParams } = new URL(req.url);
@@ -36,7 +36,7 @@ export async function GET(req) {
 
 export async function POST(req) {
     await connectDB();
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     try {
         const body = await req.json();
 
@@ -105,7 +105,7 @@ export async function POST(req) {
 
 // ✅ Handle CORS for preflight requests
 export async function OPTIONS(req) {
-    const origin = req.headers.origin;
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
     return new Response(null, {
         headers: corsHeaders(origin),
         status: 204,

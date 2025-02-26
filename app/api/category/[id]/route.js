@@ -2,7 +2,7 @@ import connectDB from '@/config/db';
 import { Category, Product, Stock } from '@/models/index';
 import { corsHeaders } from '@/config/cors';
 
-export async function PUT(req, { }) {
+export async function PUT(req) {
     await connectDB();
 
     try {

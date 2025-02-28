@@ -89,7 +89,7 @@ export async function POST(req) {
         }
 
         return new Response(JSON.stringify({
-            message: 'Product added successfully',
+            message: 'Product added successfully.',
             product: savedProduct
         }), {
             headers: corsHeaders(origin),

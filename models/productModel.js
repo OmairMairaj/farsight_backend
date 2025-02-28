@@ -5,8 +5,8 @@ const ProductSchema = new mongoose.Schema({
     image_path: { type: String, default: null },
     type: { type: String, required: true },
     deflection: { type: String, default: '-' },
-    quantity: { type: Number, required: true, default: 0 },
-    supplier: { type: String, required: true },
+    quantity: { type: Number, default: 0 },
+    supplier: { type: String, default: '' },
     unit_cost: { type: Number, required: true, default: 0 },
     comments: { type: String, default: '' },
     category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' }

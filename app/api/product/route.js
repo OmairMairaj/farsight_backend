@@ -41,11 +41,13 @@ export async function POST(req) {
         const body = await req.json();
 
         // ✅ Validate required fields
-        if (!body.model || !body.category_id) {
+        if (!body.model || !body.category_id || !body.type || !body.unit_cost) {
             const missingFields = [];
 
             if (!body.model) missingFields.push("Model");
             if (!body.category_id) missingFields.push("Category ID");
+            if (!body.type) missingFields.push("Type");
+            if (!body.unit_cost) missingFields.push("Unit Cost");
 
             return new Response(JSON.stringify({
                 message: `Missing required fields: ${missingFields.join(", ")}`,
@@ -62,7 +64,7 @@ export async function POST(req) {
             image_path: body.image_path || null, // Optional Image (Base64)
             type: body.type || 'N/A',
             deflection: body.deflection || '-',
-            quantity: body.quantity || 0,
+            quantity: 0,
             supplier: body.supplier || 'Unknown',
             unit_cost: body.unit_cost || 0,
             comments: body.comments || '',

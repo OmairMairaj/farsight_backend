@@ -2,6 +2,42 @@ import connectDB from '@/config/db';
 import { Category, Product, Stock } from '@/models/index';
 import { corsHeaders } from '@/config/cors';
 
+export async function GET(req, context) {
+    await connectDB();
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
+    try {
+        const { id } = context.params; // ✅ Extract category ID
+
+        if (!id) {
+            return new Response(JSON.stringify({ message: 'Category ID is required' }), {
+                status: 400,
+                headers: corsHeaders(origin),
+            });
+        }
+
+        const category = await Category.findById(id);
+
+        if (!category) {
+            return new Response(JSON.stringify({ message: 'Category not found' }), {
+                status: 404,
+                headers: corsHeaders(origin),
+            });
+        }
+
+        return new Response(JSON.stringify(category), {
+            status: 200,
+            headers: corsHeaders(origin),
+        });
+
+    } catch (error) {
+        console.error('🚨 Error fetching category:', error);
+        return new Response(JSON.stringify({ message: 'Error fetching category' }), {
+            status: 500,
+            headers: corsHeaders(origin),
+        });
+    }
+}
+
 export async function PUT(req) {
     await connectDB();
     const origin = req.headers.get("origin") || req.headers.get("referer") || "";

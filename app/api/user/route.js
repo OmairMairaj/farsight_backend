@@ -120,7 +120,7 @@ export async function DELETE(req) {
 
     try {
         await User.findByIdAndDelete(req.user._id);
-        return new Response(JSON.stringify({ message: 'User deleted successfully' }), {
+        return new Response(JSON.stringify({ message: 'User deleted successfully.' }), {
             headers: corsHeaders(origin),
             status: 200,
         });

@@ -5,6 +5,7 @@ const CategorySchema = new mongoose.Schema({
     category_name: { type: String, required: true },
     category_image_path: { type: String, default: '' },
     comments: { type: String, default: '' },
+    order: { type: Number, required: true },
     products: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }] // Reference Product IDs
 });
 

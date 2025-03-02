@@ -9,7 +9,8 @@ const ProductSchema = new mongoose.Schema({
     supplier: { type: String, default: '' },
     unit_cost: { type: Number, required: true, default: 0 },
     comments: { type: String, default: '' },
-    category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' }
+    category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
+    order: { type: Number, required: true },
 });
 
 const Product = mongoose.models.Product || mongoose.model("Product", ProductSchema);

@@ -15,7 +15,7 @@ export async function GET(req) {
 
         if (categoryId) {
             // ✅ If categoryId is provided, fetch products of that category
-            products = await Product.find({ category_id: categoryId });
+            products = await Product.find({ category_id: categoryId }).sort({ order: 1 });
         } else {
             // ✅ If no categoryId, fetch all products
             products = await Product.find({});
@@ -58,6 +58,10 @@ export async function POST(req) {
             });
         }
 
+        // ✅ Get the last product order in the category
+        const lastProduct = await Product.findOne({ category_id: body.category_id }).sort({ order: -1 });
+        const newOrder = lastProduct ? lastProduct.order + 1 : 1;
+
         // ✅ Construct new product
         const newProduct = new Product({
             model: body.model,
@@ -69,6 +73,7 @@ export async function POST(req) {
             unit_cost: body.unit_cost || 0,
             comments: body.comments || '',
             category_id: body.category_id, // Reference to Category
+            order: newOrder,
         });
 
         // ✅ Save product to database
@@ -104,6 +109,58 @@ export async function POST(req) {
         });
     }
 }
+
+export async function PUT(req) {
+    await connectDB();
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "";
+
+    try {
+        const { reorderedProducts } = await req.json();
+
+        if (!Array.isArray(reorderedProducts)) {
+            return new Response(JSON.stringify({ message: "Invalid data format" }), {
+                status: 400,
+                headers: corsHeaders(origin),
+            });
+        }
+
+        // Step 1️⃣: **Reset `order` fields to `null`** (avoid duplicates)
+        await Product.updateMany({}, { $set: { order: null } });
+
+        // Step 2️⃣: **Generate Bulk Update Operations**
+        const bulkOps = reorderedProducts
+            .filter(product => product._id && typeof product.order === "number")
+            .map((product, index) => ({
+                updateOne: {
+                    filter: { _id: product._id },
+                    update: { $set: { order: index + 1 } } // Ensure unique order values
+                }
+            }));
+
+        if (bulkOps.length === 0) {
+            return new Response(JSON.stringify({ message: "No valid products to update" }), {
+                status: 400,
+                headers: corsHeaders(origin),
+            });
+        }
+
+        // Step 3️⃣: **Perform Bulk Update Safely**
+        await Product.bulkWrite(bulkOps);
+
+        return new Response(JSON.stringify({ message: "Products reordered successfully" }), {
+            status: 200,
+            headers: corsHeaders(origin),
+        });
+
+    } catch (error) {
+        console.error('🚨 Error reordering products:', error);
+        return new Response(JSON.stringify({ message: 'Error reordering products', error: error.message }), {
+            status: 500,
+            headers: corsHeaders(origin),
+        });
+    }
+}
+
 
 // ✅ Handle CORS for preflight requests
 export async function OPTIONS(req) {

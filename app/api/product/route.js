@@ -123,10 +123,7 @@ export async function PUT(req) {
             });
         }
 
-        // Step 1️⃣: **Reset `order` fields to `null`** (avoid duplicates)
-        await Product.updateMany({}, { $set: { order: null } });
-
-        // Step 2️⃣: **Generate Bulk Update Operations**
+        // Step 1️⃣: **Generate Bulk Update Operations Without Resetting Orders to Null**
         const bulkOps = reorderedProducts
             .filter(product => product._id && typeof product.order === "number")
             .map((product, index) => ({
@@ -143,7 +140,7 @@ export async function PUT(req) {
             });
         }
 
-        // Step 3️⃣: **Perform Bulk Update Safely**
+        // Step 2️⃣: **Perform Bulk Update Safely**
         await Product.bulkWrite(bulkOps);
 
         return new Response(JSON.stringify({ message: "Products reordered successfully" }), {
@@ -159,6 +156,7 @@ export async function PUT(req) {
         });
     }
 }
+
 
 
 // ✅ Handle CORS for preflight requests

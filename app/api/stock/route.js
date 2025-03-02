@@ -48,10 +48,19 @@ export async function POST(req) {
         body.quantity = Number(body.quantity);
         body.unit_cost = Number(body.unit_cost);
 
-        if (!body.product_id || !body.stock_type || isNaN(body.quantity) || body.quantity <= 0 || isNaN(body.unit_cost) || body.unit_cost <= 0) {
+        if (!body.product_id || !body.stock_type || isNaN(body.quantity) || body.quantity <= 0 || isNaN(body.unit_cost) || body.unit_cost < 0) {
             await session.abortTransaction();
             session.endSession();
             return new Response(JSON.stringify({ message: 'Missing or invalid fields' }), {
+                headers: corsHeaders(origin),
+                status: 400,
+            });
+        }
+
+        if (isNaN(body.unit_cost) || body.unit_cost === 0) {
+            await session.abortTransaction();
+            session.endSession();
+            return new Response(JSON.stringify({ message: 'Product Unit Cost is 0' }), {
                 headers: corsHeaders(origin),
                 status: 400,
             });

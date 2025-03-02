@@ -7,7 +7,7 @@ const ProductSchema = new mongoose.Schema({
     deflection: { type: String, default: '-' },
     quantity: { type: Number, default: 0 },
     supplier: { type: String, default: '' },
-    unit_cost: { type: Number, required: true, default: 0 },
+    unit_cost: { type: Number, default: 0 },
     comments: { type: String, default: '' },
     category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
     order: { type: Number, required: true },

@@ -1,5 +1,5 @@
 import connectDB from '@/config/db';
-import { Category, Product } from '@/models/index';
+import { Product } from '@/models/index';
 import { corsHeaders } from '@/config/cors'; // ✅ Ensure CORS is handled
 
 export async function PUT(req) {
